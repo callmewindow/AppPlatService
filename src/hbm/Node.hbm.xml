@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+    <class name="entity.databaseEntity.Node" table="node" catalog="appplat">
+        <id name="id">
+            <column name="NODE_ID" sql-type="varchar" length="40" not-null="true"/>
+        </id>
+        <property name="name">
+            <column name="NODE_NAME" sql-type="varchar" length="1000"/>
+        </property>
+        <property name="nodeType">
+            <column name="NODE_TYPE" sql-type="varchar" length="40"/>
+        </property>
+        <property name="nodeOrder">
+            <column name="NODE_ORDER" sql-type="int"/>
+        </property>
+        <property name="parentId">
+            <column name="PARENT_ID" sql-type="varchar" length="40"/>
+        </property>
+        <property name="rootId">
+            <column name="ROOT_ID" sql-type="varchar" length="40"/>
+        </property>
+        <property name="isRoot">
+            <column name="IS_ROOT" sql-type="tinyint"/>
+        </property>
+        <property name="leaf">
+            <column name="IS_LEAF" sql-type="tinyint"/>
+        </property>
+        <property name="dataId">
+            <column name="DATA_ID" sql-type="varchar" length="40"/>
+        </property>
+        <property name="nodeFilePath">
+            <column name="NODE_FILE_PATH" sql-type="varchar" length="1000"/>
+        </property>
+    </class>
+</hibernate-mapping>

@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+            http://www.springframework.org/schema/tx
+            http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+            http://www.springframework.org/schema/aop
+            http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+            http://cxf.apache.org/jaxrs
+            http://cxf.apache.org/schemas/jaxrs.xsd">
+
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
+    <import resource="MySqlDataSource.xml"/>
+
+    <bean id="sessionFactory"
+          class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource">
+            <ref bean="dataSource"/>
+        </property>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+                <!--这个属性会控制控制台是否输出操作数据库的sql语句-->
+                <prop key="hibernate.show_sql">false</prop>
+                <prop key="hibernate.format_sql">false</prop>
+                <prop key="hibernate.use_sql_comments">false</prop>
+                <prop key="hibernate.cache.use_second_level_cache">false</prop>
+            </props>
+        </property>
+
+        <property name="mappingResources">
+            <list>
+                <value>hbm/Node.hbm.xml</value>
+                <value>hbm/PreTaskUser.hbm.xml</value>
+                <value>hbm/Process.hbm.xml</value>
+                <value>hbm/Task.hbm.xml</value>
+                <value>hbm/TaskProcess.hbm.xml</value>
+                <value>hbm/TaskUser.hbm.xml</value>
+                <value>hbm/User.hbm.xml</value>
+                <value>hbm/PersonalTask.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- 事务管理器 -->
+    <!--使用面向切面添加上事务管理-->
+    <bean id="txManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <tx:advice id="txAdvice" transaction-manager="txManager">
+        <tx:attributes>
+            <tx:method name="*" propagation="REQUIRED" />
+        </tx:attributes>
+    </tx:advice>
+
+    <aop:config>
+        <aop:pointcut id="interceptorPointCuts"
+                      expression="execution(* service.*.*(..))" />
+        <aop:advisor advice-ref="txAdvice"
+                     pointcut-ref="interceptorPointCuts" />
+    </aop:config>
+
+
+    <!--<http-conf:destination name="*.http-destination">-->
+    <!--<http-conf:server ReceiveTimeout="10000"/>-->
+    <!--</http-conf:destination>-->
+    <!--这里的*.http-destination 是指对所有的Web 服务发布起作用，如果你想对一部分起作用，可以使用{targetNamespace}serviceName.http-destination 来设置。-->
+
+
+    <bean id="treeManageBean" class="webService.opImpl.TreeManageImpl">
+        <property name="allServices" ref="allServices"></property>
+    </bean>
+    <bean id="taskManageBean" class="webService.opImpl.TaskManageImpl">
+        <property name="allServices" ref="allServices"></property>
+    </bean>
+    <bean id="structFileManageBean" class="webService.opImpl.StructFileManage">
+        <property name="allServices" ref="allServices"></property>
+    </bean>
+    <bean id="orbitFileManageBean" class="webService.opImpl.OrbitFileManage">
+        <property name="allServices" ref="allServices"></property>
+    </bean>
+    <bean id="coverAnalysisManage" class="webService.opImpl.CoverAnalysisManage">
+        <property name="allServices" ref="allServices"></property>
+    </bean>
+    <bean id="dataTransAnalysisManage" class="webService.opImpl.DataTransAnalysisManage">
+        <property name="allServices" ref="allServices"></property>
+    </bean>
+    <bean id="InterfaceManageBean" class="webService.opImpl.InterfaceManage">
+        <property name="allServices" ref="allServices"></property>
+    </bean>
+    <bean id="collaDesignManageBean" class="webService.opImpl.CollaDesignManage">
+        <property name="allServices" ref="allServices"></property>
+    </bean>
+    <!-- 实现ISolutionInfo接口的发布 Rest风格 -->
+    <jaxrs:server id="TreeManageRest" address="/TreeManage">
+        <jaxrs:serviceBeans>
+            <ref bean="treeManageBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:extensionMappings>
+        <entry key="json" value="application/json"/>
+        <entry key="xml" value="application/xml"/>
+    </jaxrs:extensionMappings>
+        <jaxrs:providers>
+            <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider"/>
+        </jaxrs:providers>
+    </jaxrs:server>
+
+    <jaxrs:server id="TaskManageRest" address="/TaskManage">
+        <jaxrs:serviceBeans>
+            <ref bean="taskManageBean"></ref>
+        </jaxrs:serviceBeans>
+        <jaxrs:extensionMappings>
+            <entry key="json" value="application/json"></entry>
+            <entry key="xml" value="application/xml"></entry>
+        </jaxrs:extensionMappings>
+        <jaxrs:providers>
+            <bean class="org.codehaus.jackson.jaxrs.JacksonJaxbJsonProvider"></bean>
+        </jaxrs:providers>
+    </jaxrs:server>
+
+    <jaxrs:server id="StructFileManageRest" address="/StructFileManage">
+        <jaxrs:serviceBeans>
+            <ref bean="structFileManageBean"></ref>
+        </jaxrs:serviceBeans>
+        <jaxrs:extensionMappings>
+            <entry key="json" value="application/json"></entry>
+            <entry key="xml" value="application/xml"></entry>
+        </jaxrs:extensionMappings>
+        <jaxrs:providers>
+            <bean class="org.codehaus.jackson.jaxrs.JacksonJaxbJsonProvider"></bean>
+        </jaxrs:providers>
+    </jaxrs:server>
+
+    <jaxrs:server id="OrbitFileManageRest" address="/OrbitFileManage">
+        <jaxrs:serviceBeans>
+            <ref bean="orbitFileManageBean"></ref>
+        </jaxrs:serviceBeans>
+        <jaxrs:extensionMappings>
+            <entry key="json" value="application/json"></entry>
+            <entry key="xml" value="application/xml"></entry>
+        </jaxrs:extensionMappings>
+        <jaxrs:providers>
+            <bean class="org.codehaus.jackson.jaxrs.JacksonJaxbJsonProvider"></bean>
+        </jaxrs:providers>
+    </jaxrs:server>
+
+    <jaxrs:server id="InterfaceManageRest" address="/InterfaceManage">
+        <jaxrs:serviceBeans>
+            <ref bean="InterfaceManageBean"></ref>
+        </jaxrs:serviceBeans>
+      <jaxrs:extensionMappings>
+          <entry key="json" value="application/json"></entry>
+          <entry key="xml" value="application/xml"></entry>
+      </jaxrs:extensionMappings>
+      <jaxrs:providers>
+          <bean class="org.codehaus.jackson.jaxrs.JacksonJaxbJsonProvider"></bean>
+      </jaxrs:providers>
+    </jaxrs:server>
+
+    <jaxrs:server id="CoverAnalysisManageRest" address="/CoverAnalysisManage">
+        <jaxrs:serviceBeans>
+            <ref bean="coverAnalysisManage"></ref>
+        </jaxrs:serviceBeans>
+        <jaxrs:extensionMappings>
+            <entry key="json" value="application/json"></entry>
+            <entry key="xml" value="application/xml"></entry>
+        </jaxrs:extensionMappings>
+        <jaxrs:providers>
+            <bean class="org.codehaus.jackson.jaxrs.JacksonJaxbJsonProvider"></bean>
+        </jaxrs:providers>
+    </jaxrs:server>
+
+    <jaxrs:server id="DataTransAnalysisManageRest" address="/DataTransAnalysisManage">
+        <jaxrs:serviceBeans>
+            <ref bean="dataTransAnalysisManage"></ref>
+        </jaxrs:serviceBeans>
+        <jaxrs:extensionMappings>
+            <entry key="json" value="application/json"></entry>
+            <entry key="xml" value="application/xml"></entry>
+        </jaxrs:extensionMappings>
+        <jaxrs:providers>
+            <bean class="org.codehaus.jackson.jaxrs.JacksonJaxbJsonProvider"></bean>
+        </jaxrs:providers>
+    </jaxrs:server>
+
+    <jaxrs:server id="CollaDesignManageRest" address="/CollaDesignManage">
+        <jaxrs:serviceBeans>
+            <ref bean="collaDesignManageBean"></ref>
+        </jaxrs:serviceBeans>
+        <jaxrs:extensionMappings>
+            <entry key="json" value="application/json"></entry>
+            <entry key="xml" value="application/xml"></entry>
+        </jaxrs:extensionMappings>
+        <jaxrs:providers>
+            <bean class="org.codehaus.jackson.jaxrs.JacksonJaxbJsonProvider"></bean>
+        </jaxrs:providers>
+    </jaxrs:server>
+
+    <!--配置Dao包下的IOC控制-->
+    <bean id="baseDao" class="dao.BaseDAO">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+    <bean id="nodeDao" class="dao.NodeDAO" parent="baseDao"></bean>
+    <bean id="preTaskUserDao" class="dao.PreTaskUserDAO" parent="baseDao"></bean>
+    <bean id="processDao" class="dao.ProcessDAO" parent="baseDao"></bean>
+    <bean id="taskDao" class="dao.TaskDAO" parent="baseDao"/>
+    <bean id="taskProcessDao" class="dao.TaskProcessDAO" parent="baseDao"></bean>
+    <bean id="taskUserDao" class="dao.TaskUserDAO" parent="baseDao"></bean>
+    <bean id="userDao" class="dao.UserDAO" parent="baseDao"></bean>
+    <bean id="personalTaskDAO" class="dao.PersonalTaskDAO" parent="baseDao"></bean>
+
+    <bean id="allDao" class="dao.AllDAO">
+        <property name="nodeDAO" ref="nodeDao"></property>
+        <property name="preTaskUserDAO" ref="preTaskUserDao"></property>
+        <property name="processDAO" ref="processDao"></property>
+        <property name="taskDAO" ref="taskDao"/>
+        <property name="taskProcessDAO" ref="taskProcessDao"></property>
+        <property name="taskUserDAO" ref="taskUserDao"></property>
+        <property name="userDAO" ref="userDao"></property>
+        <property name="personalTaskDAO" ref="personalTaskDAO"></property>
+    </bean>
+    <!--配置Service包下的IOC控制-->
+    <bean id="solutionService" class="service.SolutionService">
+        <property name="allDAO" ref="allDao"/>
+        <property name="allServices" ref="allServices"></property>
+    </bean>
+    <bean id="taskService" class="service.TaskService" >
+        <property name="allDAO" ref="allDao"/>
+        <property name="allServices" ref="allServices"></property>
+    </bean>
+    <bean id="localStoreService" class="service.LocalStoreService"  >
+    </bean>
+    <bean id="structFileService" class = "service.StructFileService">
+        <property name="allServices" ref="allServices"></property>
+        <property name="allDAO" ref="allDao"></property>
+    </bean>
+    <bean id="orbitFileService" class = "service.OrbitFileService">
+        <property name="allDAO" ref="allDao"></property>
+        <property name="allServices" ref="allServices"></property>
+    </bean>
+    <bean id="cloudStoreService" class="service.CloudStoreService"></bean>
+    <!--<bean id="profilesService" class="service.ProfilesService"></bean>-->
+    <bean id="digitalSignatureService" class="service.DigitalSignatureService">
+        <property name="allDAO" ref="allDao"></property>
+    </bean>
+    <bean id="accessStatisicService" class="service.AccessStatisicService"></bean>
+    <bean id="serverStoreService" class="service.ServerStoreService"></bean>
+    <bean id="enCloudStoreService" class="service.EnCloudStoreService">
+        <property name="allServices" ref="allServices"></property>
+    </bean>
+    <bean id="coverAnalysisService" class="service.CoverAnalysisService">
+        <property name="allServices" ref="allServices"></property>
+        <property name="allDAO" ref="allDao"></property>
+    </bean>
+    <bean id="dataTransAnalysisService" class="service.DataTransAnalysisService">
+        <property name="allServices" ref="allServices"></property>
+        <property name="allDAO" ref="allDao"></property>
+    </bean>
+    <bean id="perTaskCommonService" class="service.PerTaskCommonService">
+        <property name="allDAO" ref="allDao"></property>
+    </bean>
+    <bean id="collaDesignService" class="service.CollaDesignService" >
+        <property name="allServices" ref="allServices"></property>
+    </bean>
+
+    <bean id="allServices" class="service.AllServices" >
+        <property name="solutionService" ref="solutionService"/>
+        <property name="taskService" ref="taskService"></property>
+        <property name="structFileService" ref="structFileService"></property>
+        <property name="collaDesignService" ref="collaDesignService"></property>
+        <property name="iLocalStoreService" ref="cloudStoreService"></property>
+        <property name="iDigitalSignatureService" ref="digitalSignatureService"></property>
+        <property name="iAccessStatisic" ref="accessStatisicService"></property>
+        <property name="serverStoreService" ref="serverStoreService"></property>
+        <property name="enCloudStoreService" ref="enCloudStoreService"></property>
+        <property name="orbitFileService" ref="orbitFileService"></property>
+        <property name="coverAnalysisService" ref="coverAnalysisService"></property>
+        <property name="perTaskCommonService" ref="perTaskCommonService"></property>
+        <property name="dataTransAnalysisService" ref="dataTransAnalysisService"></property>
+    </bean>
+</beans>

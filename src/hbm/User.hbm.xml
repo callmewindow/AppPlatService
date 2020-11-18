@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+    <class name="entity.databaseEntity.User" table="user"  catalog="appplat">
+        <id name="userId">
+            <column name="USER_ID" sql-type="varchar" length="40" not-null="true"/>
+        </id>
+        <property name="userAccount">
+            <column name="USER_ACCOUNT" sql-type="varchar" length="40"/>
+        </property>
+        <property name="userDepartment">
+            <column name="USER_DEPARTMENT" sql-type="varchar" length="100"/>
+        </property>
+        <property name="userDomain">
+            <column name="USER_DOMAIN" sql-type="varchar" length="40"/>
+        </property>
+        <property name="userMailbox">
+            <column name="USER_MAILBOX" sql-type="varchar" length="100"/>
+        </property>
+        <property name="userName">
+            <column name="USER_NAME" sql-type="varchar" length="1000"/>
+        </property>
+        <property name="userPermission">
+            <column name="USER_PERMISSION" sql-type="varchar" length="40"/>
+        </property>
+        <property name="userTelephone">
+            <column name="USER_TELEPHONE" sql-type="varchar" length="40"/>
+        </property>
+        <set name="taskUsersByUserId" inverse="true">
+            <key>
+                <column name="USER_ID"/>
+            </key>
+            <one-to-many not-found="ignore" class="entity.databaseEntity.TaskUser"/>
+        </set>
+    </class>
+</hibernate-mapping>

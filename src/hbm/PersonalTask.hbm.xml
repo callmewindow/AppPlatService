@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+    <class name="entity.databaseEntity.PersonalTask" table="personal_task"  catalog="appplat">
+        <id name="perTaskId">
+            <column name="PER_TASK_ID" sql-type="varchar" length="40" not-null="true"/>
+            <generator class="uuid.hex"></generator>
+        </id>
+        <property name="perTaskName">
+            <column name="PER_TASK_NAME" sql-type="varchar" length="1000"/>
+        </property>
+        <property name="taskType">
+            <column name="TASK_TYPE" sql-type="varchar" length="40"/>
+        </property>
+        <property name="recentlyModified">
+            <column name="RECENTLY_MODIFIED" sql-type="timestamp" not-null="true"/>
+        </property>
+        <property name="isSaved">
+            <column name="IS_SAVED" sql-type="tinyint"/>
+        </property>
+        <property name="userId">
+            <column name="USER_ID" sql-type="varchar" length="40"/>
+        </property>
+        <property name="taskDirPath">
+            <column name="TASK_DIR_PATH" sql-type="varchar" length="1000"/>
+        </property>
+    </class>
+</hibernate-mapping>

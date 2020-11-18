@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+    <class name="entity.databaseEntity.PreTaskUser" table="pre_task_user" catalog="appplat">
+        <id name="preTaskUserId">
+            <column name="PRE_TASK_USER_ID" sql-type="varchar" length="40" not-null="true"/>
+            <generator class="uuid.hex"></generator>
+        </id>
+        <property name="userMailbox">
+            <column name="USER_MAILBOX" sql-type="varchar" length="100"/>
+        </property>
+        <property name="isPassed">
+            <column name="IS_PASSED" sql-type="int"/>
+        </property>
+        <many-to-one name="taskByTaskId" class="entity.databaseEntity.Task">
+            <column name="TASK_ID" not-null="true"/>
+        </many-to-one>
+    </class>
+</hibernate-mapping>

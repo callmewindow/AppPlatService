@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+    <class name="entity.databaseEntity.TaskProcess" table="task_process" catalog="appplat">
+        <id name="taskProcessId">
+            <column name="TASK_PROCESS_ID" sql-type="varchar" length="40" not-null="true"/>
+            <generator class="uuid.hex"></generator>
+        </id>
+        <property name="isSubmit">
+            <column name="IS_SUBMIT" sql-type="tinyint"/>
+        </property>
+        <many-to-one name="processByProcessId" class="entity.databaseEntity.Process">
+            <column name="PROCESS_ID"/>
+        </many-to-one>
+        <many-to-one name="taskByTaskId" class="entity.databaseEntity.Task">
+            <column name="TASK_ID"/>
+        </many-to-one>
+    </class>
+</hibernate-mapping>

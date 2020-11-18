@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+    <class name="entity.databaseEntity.Task" table="task" catalog="appplat">
+        <id name="taskId">
+            <column name="TASK_ID" sql-type="varchar" length="40" not-null="true"/>
+            <generator class="uuid.hex"></generator>
+        </id>
+        <property name="taskName">
+            <column name="TASK_NAME" sql-type="varchar" length="1000" not-null="true"/>
+        </property>
+        <property name="startTime">
+            <column name="START_TIME" sql-type="timestamp" not-null="true"/>
+        </property>
+        <property name="simulationStartTime">
+            <column name="SIMULATION_START_TIME" sql-type="timestamp" not-null="true"/>
+        </property>
+        <property name="simulationEndTime">
+            <column name="SIMULATION_END_TIME" sql-type="timestamp" not-null="true"/>
+        </property>
+        <property name="description">
+            <column name="DESCRIPTION" sql-type="text" length="65535"/>
+        </property>
+        <property name="step">
+            <column name="STEP" sql-type="int"/>
+        </property>
+        <property name="recentlyModified">
+            <column name="RECENTLY_MODIFIED" sql-type="timestamp" not-null="true"/>
+        </property>
+        <set name="preTaskUsersByTaskId" inverse="true">
+            <key>
+                <column name="TASK_ID" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="entity.databaseEntity.PreTaskUser"/>
+        </set>
+        <set name="taskProcessesByTaskId" inverse="true">
+            <key>
+                <column name="TASK_ID"/>
+            </key>
+            <one-to-many not-found="ignore" class="entity.databaseEntity.TaskProcess"/>
+        </set>
+        <set name="taskUsersByTaskId" inverse="true">
+            <key>
+                <column name="TASK_ID"/>
+            </key>
+            <one-to-many not-found="ignore" class="entity.databaseEntity.TaskUser"/>
+        </set>
+    </class>
+</hibernate-mapping>
